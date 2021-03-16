@@ -1,0 +1,367 @@
+{
+  "systems": [
+    {
+      "id": 1,
+      "name": "InterSCity",
+      "description": "foo bar baz"
+    }
+  ],
+  "modules": [
+    {
+      "id": 1,
+      "systemId": 1,
+      "name": "Actuator Controller"
+    },
+    {
+      "id": 2,
+      "systemId": 1,
+      "name": "Data Collector"
+    },
+    {
+      "id": 3,
+      "systemId": 1,
+      "name": "Resource Adaptor"
+    },
+    {
+      "id": 4,
+      "systemId": 1,
+      "name": "Resource Catalog"
+    },
+    {
+      "id": 5,
+      "systemId": 1,
+      "name": "Resource Discovery"
+    }
+  ],
+  "services": [
+    {
+      "id": 1,
+      "moduleId": 1,
+      "name": "Actuator Controller",
+      "databases": [
+        {
+          "databaseId": 1,
+          "role": "main storage",
+          "access_type": "rw",
+          "namespace": "actuator-controller-mongo"
+        }
+      ],
+      "sends_to": [
+        {
+          "serviceId": 3,
+          "label": "ActuatorCommandNotifier"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "moduleId": 2,
+      "name": "Data Collector",
+      "databases": [
+        {
+          "databaseId": 2,
+          "role": "main storage",
+          "access_type": "rw",
+          "namespace": "data-controller-mongo"
+        },
+        {
+          "databaseId": 3,
+          "role": "cache",
+          "access_type": "rw",
+          "namespace": "data-controller-mongo-cache"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "moduleId": 3,
+      "name": "Resource Adaptor",
+      "databases": [
+        {
+          "databaseId": 4,
+          "role": "main storage",
+          "access_type": "rw",
+          "namespace": "resource-adaptor-pg"
+        },
+        {
+          "databaseId": 5,
+          "role": "cache",
+          "access_type": "rw",
+          "namespace": "resource-adaptor-redis"
+        }
+      ],
+      "sends_to": [
+        {
+          "serviceId": 1,
+          "label": "ActuatorCommandUpdater"
+        },
+        {
+          "serviceId": 2,
+          "label": "DataReceiver"
+        },
+        {
+          "serviceId": 4,
+          "label": "LocationUpdater"
+        }
+      ],
+      "requests_from": [
+        {
+          "serviceId": 4,
+          "label": "POST /catalog/resources"
+        },
+        {
+          "serviceId": 4,
+          "label": "PUT /catalog/resources/:id"
+        },
+        {
+          "serviceId": 4,
+          "label": "GET /catalog/resources/:id"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "moduleId": 4,
+      "name": "Resource Adaptor",
+      "databases": [
+        {
+          "databaseId": 6,
+          "role": "main storage",
+          "access_type": "rw",
+          "namespace": "resource-cataloguer-pg"
+        },
+        {
+          "databaseId": 7,
+          "role": "cache",
+          "access_type": "rw",
+          "namespace": "resource-cataloguer-redis"
+        }
+      ],
+      "sends_to": [
+        {
+          "serviceId": 1,
+          "label": "ResourceCreator"
+        },
+        {
+          "serviceId": 1,
+          "label": "ResourceUpdater"
+        },
+        {
+          "serviceId": 2,
+          "label": "ResourceCreator"
+        },
+        {
+          "serviceId": 2,
+          "label": "ResourceUpdater"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "moduleId": 5,
+      "name": "Resource Discovery",
+      "databases": [
+        {
+          "databaseId": 8,
+          "role": "cache",
+          "access_type": "rw",
+          "namespace": "resource-discoverer-redis"
+        }
+      ],
+      "requests_from": [
+        {
+          "serviceId": 2,
+          "label": "POST /collector/resources/data"
+        },
+        {
+          "serviceId": 4,
+          "label": "GET /catalog/resources/search"
+        }
+      ]
+    }
+  ],
+  "operations": [
+    {
+      "id": 1,
+      "serviceId": 1,
+      "label": "GET /actuator/commands"
+    },
+    {
+      "id": 2,
+      "serviceId": 1,
+      "label": "POST /actuator/commands"
+    },
+    {
+      "id": 3,
+      "serviceId": 2,
+      "label": "POST /collector/resources/data"
+    },
+    {
+      "id": 4,
+      "serviceId": 2,
+      "label": "POST /collector/resources/:id/data"
+    },
+    {
+      "id": 5,
+      "serviceId": 2,
+      "label": "POST /collector/resources/data/last"
+    },
+    {
+      "id": 6,
+      "serviceId": 2,
+      "label": "POST /collector/resources/:id/data/last"
+    },
+    {
+      "id": 7,
+      "serviceId": 3,
+      "label": "POST /adaptor/resources"
+    },
+    {
+      "id": 8,
+      "serviceId": 3,
+      "label": "POST /adaptor/resources"
+    },
+    {
+      "id": 9,
+      "serviceId": 3,
+      "label": "PUT /adaptor/resources/:id"
+    },
+    {
+      "id": 10,
+      "serviceId": 3,
+      "label": "POST /adaptor/resources/:id/data"
+    },
+    {
+      "id": 11,
+      "serviceId": 3,
+      "label": "POST /adaptor/subscriptions"
+    },
+    {
+      "id": 12,
+      "serviceId": 3,
+      "label": "GET /adaptor/subscriptions"
+    },
+    {
+      "id": 13,
+      "serviceId": 3,
+      "label": "PUT /adaptor/subscriptions/:id"
+    },
+    {
+      "id": 14,
+      "serviceId": 3,
+      "label": "GET /adaptor/subscriptions/:id"
+    },
+    {
+      "id": 15,
+      "serviceId": 3,
+      "label": "POST /adaptor/resources/:id/data/:capability"
+    },
+    {
+      "id": 16,
+      "serviceId": 4,
+      "label": "GET /catalog/resources"
+    },
+    {
+      "id": 17,
+      "serviceId": 4,
+      "label": "POST /catalog/resources"
+    },
+    {
+      "id": 18,
+      "serviceId": 4,
+      "label": "GET /catalog/resources/sensors"
+    },
+    {
+      "id": 19,
+      "serviceId": 4,
+      "label": "GET /catalog/resources/actuators"
+    },
+    {
+      "id": 20,
+      "serviceId": 4,
+      "label": "GET /catalog/resources/search"
+    },
+    {
+      "id": 21,
+      "serviceId": 4,
+      "label": "PUT /catalog/resources/:id"
+    },
+    {
+      "id": 22,
+      "serviceId": 4,
+      "label": "GET /catalog/resources/:id"
+    },
+    {
+      "id": 23,
+      "serviceId": 4,
+      "label": "GET /catalog/capabilities"
+    },
+    {
+      "id": 24,
+      "serviceId": 4,
+      "label": "POST /catalog/capabilities"
+    },
+    {
+      "id": 25,
+      "serviceId": 4,
+      "label": "GET /catalog/capabilities/:name"
+    },
+    {
+      "id": 26,
+      "serviceId": 4,
+      "label": "PUT /catalog/capabilities/:name"
+    },
+    {
+      "id": 27,
+      "serviceId": 4,
+      "label": "DELETE /catalog/capabilities/:name"
+    },
+    {
+      "id": 28,
+      "serviceId": 5,
+      "label": "GET /discovery/resources"
+    }
+  ],
+  "databases": [
+    {
+      "id": 1,
+      "model": "documents",
+      "make": "MongoDB"
+    },
+    {
+      "id": 2,
+      "model": "documents",
+      "make": "MongoDB"
+    },
+    {
+      "id": 3,
+      "model": "documents",
+      "make": "MongoDB"
+    },
+    {
+      "id": 4,
+      "model": "relational",
+      "make": "PostGreSQL"
+    },
+    {
+      "id": 5,
+      "model": "key-value",
+      "make": "Redis"
+    },
+    {
+      "id": 6,
+      "model": "relational",
+      "make": "PostGreSQL"
+    },
+    {
+      "id": 7,
+      "model": "key-value",
+      "make": "Redis"
+    },
+    {
+      "id": 8,
+      "model": "key-value",
+      "make": "Redis"
+    }
+  ]
+}
