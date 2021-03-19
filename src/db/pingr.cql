@@ -134,15 +134,15 @@ CREATE
 (ChatID:Channel {label:'chat.<id>'}),
 
 
-(User)-[:PUBLISHES_TO {event:'USER_D'}]->(UserNew),
+(User)-[:PUBLISHES_TO {event:'USER_CREATED'}]->(UserNew),
 (User)-[:PUBLISHES_TO {event:'USER_UPDATED'}]->(UserID),
 (User)-[:PUBLISHES_TO {event:'USER_DELETED'}]->(UserID),
 (Follow)-[:PUBLISHES_TO {event:'A_REQUESTED_FOLLOWING_B'}]->(FollowRequestNew),
 (Follow)-[:PUBLISHES_TO {event:'A_BEGAN_FOLLOWING_B'}]->(FollowingNew),
 (Follow)-[:PUBLISHES_TO {event:'UPDATED_SPECIAL_FRIENDS'}]->(UserSpecialFriends),
-(Chat)-[:PUBLISHES_TO {event:'CHAT_D'}]->(ChatNew),
+(Chat)-[:PUBLISHES_TO {event:'CHAT_CREATED'}]->(ChatNew),
 (Chat)-[:PUBLISHES_TO {event:'DP_SENT'}]->(ChatID),
-(Pings)-[:PUBLISHES_TO {event:'PING_D'}]->(UserPings),
+(Pings)-[:PUBLISHES_TO {event:'PING_CREATED'}]->(UserPings),
 (Pings)-[:PUBLISHES_TO {event:'PING_DELETED'}]->(PingID),
 (Likes)-[:PUBLISHES_TO {event:'PING_LIKED'}]->(PingID),
 (Likes)-[:PUBLISHES_TO {event:'PING_LIKE_REMOVED'}]->(PingID),
