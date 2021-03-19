@@ -1,55 +1,111 @@
 import neo4j from 'neo4j-driver';
-const driver = neo4j.driver('bolt://3.83.214.196:7687', neo4j.auth.basic('neo4j', 'gate-honk-evaluations'), {});
 
-const session = driver.session({ database: 'neo4j' });
+function connectNeo4j(): any {
+  const driver = neo4j.driver('bolt://3.83.214.196:7687', neo4j.auth.basic('neo4j', 'gate-honk-evaluations'), {});
 
-function findSharedDBs(session, system) {
-  const query = `
-  MATCH (sharedDBCandidate:Database)<-[usage:USES]-(s:Service)-[:SVC_BLONGS_TO_SYS]->(sys:System {title:$system})
-  WITH sharedDBCandidate.name AS db, COUNT(s) AS nServices
-  WHERE nServices >= $nServices
-  RETURN db, nServices;
-  `;
+  const session = driver.session({ database: 'neo4j' });
 
-  const params = { system, nServices: 2 };
-
-  return new Promise((res, rej) => {
-    session
-      .run(query, params)
-      .then((result) => {
-        if (result.records.length)
-          result.records.forEach((record) => {
-            const db = record.get('db');
-            const n = record.get('nServices');
-
-            console.log(`${db}:\t${n}`);
-          });
-        else console.log('no records found');
-        res(result.records);
-      })
-      .catch((error) => {
-        rej(error);
-      });
-  });
+  return { driver, session };
 }
 
-function findCQRSQueryCandidates(session) {
-  const query = `
-  MATCH (Auth:Service {name:'Autenticação'})-[:REQUESTS_FROM {verb:'GET'}]->(qCandidate:Service)<-[:SENDS_TO]-(n:Service)
-  RETURN qCandidate, n;
-  `;
-
-  return new Promise((res, rej) => {
-    session
-      .run(query)
-      .then((result) => {
-        console.log(result.records);
-        res(result.records);
-      })
-      .catch((err) => rej(err));
-  });
+function disconnectNeo4j(session, driver) {
+  session.close();
+  driver.close();
 }
 
-findSharedDBs(session, 'Pingr').then(() => {
-  findCQRSQueryCandidates(session);
-});
+async function getSharedDBs(session, system): Promise<any> {
+  const query = `
+  MATCH (db:Database)<-[r:USES]-(svc:Service)-[:BELONGS_TO]->(:System {name:$system})
+  WITH COUNT(svc) AS nSvcs, COLLECT(svc) AS svcs, db AS sharedDB
+  WHERE nSvcs > 1
+  RETURN sharedDB, nSvcs, svcs
+  `;
+
+  const params = { system };
+
+  let result = null;
+  try {
+    result = await session.run(query, params);
+  } catch (err) {
+    console.log(err);
+  } finally {
+    return result;
+  }
+}
+
+function interpretSharedDBs(result): any {
+  const { records } = result;
+
+  if (!records.length) return null;
+
+  const sharedDBs = [];
+  records.forEach((record) => {
+    const sharedDB = record.get('sharedDB');
+    const svcs = record.get('svcs');
+    const nSvcs = record.get('nSvcs');
+
+    sharedDBs.push({
+      db: { ...sharedDB.properties },
+      sharingDegree: nSvcs.low,
+      sharingServices: [...svcs.map(({ properties }) => properties)],
+    });
+  });
+
+  return sharedDBs;
+}
+
+async function getCQRS(session, system): Promise<any> {
+  const query = `
+  MATCH
+  (qSide:Service)-[:BELONGS_TO]->(:System {title:$system}),
+  (qSide)-[:EXPOSES]->(:Operation {verb:'GET'}),
+  (qSide)-[:SUBSCRIBES_TO]->(channel:Channel)<-[:PUBLISHES_TO]-(cSide:Service)
+  WITH COLLECT(distinct cSide) AS commandServices, qSide AS queryService
+  RETURN queryService, commandServices
+  `;
+
+  const params = { system };
+
+  let result = null;
+  try {
+    result = await session.run(query, params);
+  } catch (err) {
+    console.log(err);
+  } finally {
+    return result;
+  }
+}
+
+function interpretCQRS(result): any {
+  const { records } = result;
+
+  if (!records.length) return null;
+
+  const CQRSs = [];
+  records.forEach((record) => {
+    const queryService = record.get('queryService');
+    const commandServices = record.get('commandServices');
+    CQRSs.push({
+      queryService: { ...queryService.properties },
+      commandServices: commandServices.map(({ properties }) => properties),
+    });
+  });
+
+  return CQRSs;
+}
+
+async function main() {
+  const { session, driver } = connectNeo4j();
+
+  let result = await getSharedDBs(session, 'Fake');
+  const sharedDBs = interpretSharedDBs(result);
+  console.log('shared DBs:', sharedDBs);
+
+  result = await getCQRS(session, 'Pingr');
+  const cqrs = interpretCQRS(result);
+  console.log('CQRS:', cqrs);
+
+  disconnectNeo4j(session, driver);
+}
+
+main();
