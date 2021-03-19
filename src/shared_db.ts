@@ -39,8 +39,8 @@ function interpretSharedDBs(result): any {
   return sharedDBs;
 }
 
-async function main(session): Promise<void> {
-  const result = await getSharedDBs(session, 'Fake');
+async function main(session, system): Promise<void> {
+  const result = await getSharedDBs(session, system);
   const sharedDBs = interpretSharedDBs(result);
   console.log('shared DBs:', sharedDBs);
 }

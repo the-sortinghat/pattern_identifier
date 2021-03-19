@@ -38,8 +38,8 @@ function interpretCQRS(result): any {
   return CQRSs;
 }
 
-async function main(session): Promise<void> {
-  const result = await getCQRS(session, 'Pingr');
+async function main(session, system): Promise<void> {
+  const result = await getCQRS(session, system);
   const cqrs = interpretCQRS(result);
   console.log('CQRS:', cqrs);
 }
