@@ -1,6 +1,6 @@
-import { neo4jAdapter } from './neo4j';
-import { sharedDB } from './shared_db';
-import { CQRS } from './cqrs';
+import neo4jAdapter from './neo4j';
+import sharedDB from './shared_db';
+import CQRS from './cqrs';
 
 async function analyze(system): Promise<void> {
   const { session, driver } = neo4jAdapter.connect();

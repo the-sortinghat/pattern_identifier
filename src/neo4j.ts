@@ -20,7 +20,7 @@ function disconnectNeo4j(session, driver): void {
   driver.close();
 }
 
-export const neo4jAdapter = {
+export default {
   connect: connectNeo4j,
   disconnect: disconnectNeo4j,
 };

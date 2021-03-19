@@ -45,6 +45,6 @@ async function main(session, system): Promise<void> {
   console.log('shared DBs:', sharedDBs);
 }
 
-export const sharedDB = {
+export default {
   run: main,
 };

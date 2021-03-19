@@ -44,6 +44,6 @@ async function main(session, system): Promise<void> {
   console.log('CQRS:', cqrs);
 }
 
-export const CQRS = {
+export default {
   run: main,
 };
