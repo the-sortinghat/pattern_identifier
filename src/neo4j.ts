@@ -5,7 +5,7 @@ config();
 
 function connectNeo4j(): any {
   const url = process.env.NEO4J_URL;
-  const user = process.env.NEO4j_USER;
+  const user = process.env.NEO4J_USER;
   const pw = process.env.NEO4J_PASSWORD;
 
   const driver = neo4j.driver(url, neo4j.auth.basic(user, pw), {});
