@@ -18,3 +18,5 @@ services:
       - neo4j
     env_file:
       - .env
+    volumes:
+      - ./:/usr/src/app
