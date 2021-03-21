@@ -8,3 +8,12 @@ services:
     ports:
       - 7474:7474
       - 7687:7687
+    volumes:
+      - ./neo4j-data:/data
+
+  app:
+    build: .
+    depends_on:
+      - neo4j
+    env_file:
+      - .env
