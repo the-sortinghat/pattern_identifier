@@ -11,7 +11,9 @@
     "lint:fix": "yarn lint:analyze --fix",
     "lint": "yarn lint:analyze",
     "test": "jest",
-    "test:watch": "jest --watchAll"
+    "test:watch": "jest --watchAll",
+    "docs:dev": "vuepress dev docs",
+    "docs:build": "vuepress build docs"
   },
   "devDependencies": {
     "@types/jest": "^26.0.21",
@@ -26,7 +28,8 @@
     "prettier": "^2.2.1",
     "ts-jest": "^26.5.4",
     "ts-node": "^9.1.1",
-    "typescript": "^4.2.3"
+    "typescript": "^4.2.3",
+    "vuepress": "^1.8.2"
   },
   "dependencies": {
     "dotenv": "^8.2.0",
