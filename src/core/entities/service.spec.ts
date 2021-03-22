@@ -1,5 +1,6 @@
-import {Service} from './service';
-import {System} from './system';
+import { Service } from './service';
+import { System } from './system';
+import { Database } from './database';
 
 describe('service', () => {
   let sys: System;
@@ -28,5 +29,16 @@ describe('service', () => {
     const svc = new Service('foo', sys);
 
     expect(sys.addChildService).toHaveBeenCalledWith(svc);
+  });
+
+  it('accepts adding database usage', () => {
+    const svc = new Service('foo', sys);
+
+    const mockDB = new Database('mock', 'mock', 'mockdb');
+    mockDB.acceptConnectionFromService = jest.fn();
+    svc.connectToDatabase(mockDB);
+
+    expect(svc.databases).toHaveLength(1);
+    expect(mockDB.acceptConnectionFromService).toHaveBeenCalledWith(svc);
   });
 });
