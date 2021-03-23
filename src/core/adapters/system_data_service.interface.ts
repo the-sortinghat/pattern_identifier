@@ -1,5 +1,5 @@
-import {CQRS} from '../entities/cqrs';
+import { CQRS } from '../entities/cqrs';
 
 export interface SystemDataServiceInterface {
-  fetchCQRSCandidates: (systemTitle: string) => Promise<CQRS>;
+  fetchCQRSCandidates: (systemTitle: string) => Promise<CQRS[]>;
 }
