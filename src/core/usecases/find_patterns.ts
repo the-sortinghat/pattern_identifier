@@ -9,8 +9,14 @@ export class FindPatterns {
   constructor(private readonly systemDS: SystemDataServiceInterface) {}
 
   async run(systemTitle: string): Promise<PatternsHashInterface> {
-    const cqrsCandidates = await this.systemDS.fetchCQRSCandidates(systemTitle);
+    const system = await this.systemDS.findOne(systemTitle);
 
-    return { cqrs: cqrsCandidates };
+    if (system) {
+      const cqrsCandidates = await this.systemDS.fetchCQRSCandidates(system);
+
+      return { cqrs: cqrsCandidates };
+    } else {
+      return { cqrs: [] };
+    }
   }
 }

@@ -1,5 +1,7 @@
+import { System } from '../entities/system';
 import { CQRS } from '../entities/cqrs';
 
 export interface SystemDataServiceInterface {
-  fetchCQRSCandidates: (systemTitle: string) => Promise<CQRS[]>;
+  findOne: (title: string) => Promise<System | null>;
+  fetchCQRSCandidates: (system: System) => Promise<CQRS[]>;
 }
